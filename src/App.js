@@ -20,6 +20,81 @@ if (!firebase.apps.length) {
 
 const db = firebase.firestore();
 
+const InspeccionModal = ({ show, nuevaInspeccion, setNuevaInspeccion, setShowInspeccion, agregarInspeccion }) => {
+  if (!show) return null;
+
+  return (
+    <div className="modal-backdrop">
+      <div className="modal scrollable">
+        <h3>🧪 Nueva Inspección</h3>
+        <input
+          type="date"
+          value={nuevaInspeccion.fecha}
+          onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, fecha: e.target.value })}
+        />
+        <label className="label">Tipo de inspección</label>
+        <div className="radio-group">
+          <label className="radio-option">
+            <input
+              type="radio"
+              value="Formal"
+              checked={nuevaInspeccion.tipo === 'Formal'}
+              onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, tipo: e.target.value })}
+            /> Formal
+          </label>
+          <label className="radio-option">
+            <input
+              type="radio"
+              value="Post-operación"
+              checked={nuevaInspeccion.tipo === 'Post-operación'}
+              onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, tipo: e.target.value })}
+            /> Post-operación
+          </label>
+        </div>
+        <label className="label">Estado</label>
+        <div className="radio-group">
+          <label className="radio-option">
+            <input
+              type="radio"
+              value="Buen estado"
+              checked={nuevaInspeccion.estado === 'Buen estado'}
+              onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, estado: e.target.value })}
+            /> Buen estado
+          </label>
+          <label className="radio-option">
+            <input
+              type="radio"
+              value="Mal estado"
+              checked={nuevaInspeccion.estado === 'Mal estado'}
+              onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, estado: e.target.value })}
+            /> Mal estado
+          </label>
+        </div>
+        <input
+          placeholder="Horas de Vuelo"
+          value={nuevaInspeccion.horaVuelo}
+          onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, horaVuelo: e.target.value })}
+        />
+        <input
+          placeholder="Técnico responsable"
+          value={nuevaInspeccion.tecnico}
+          onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, tecnico: e.target.value })}
+        />
+        <textarea
+          placeholder="Observaciones"
+          value={nuevaInspeccion.observaciones}
+          onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, observaciones: e.target.value })}
+        />
+        <div className="modal-buttons">
+          <button className="outlined" onClick={() => setShowInspeccion(false)}>Cancelar</button>
+          <button onClick={agregarInspeccion}>Guardar</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 function App() {
   const [documentos, setDocumentos] = useState([]);
   const [inspecciones, setInspecciones] = useState([]);
@@ -113,81 +188,6 @@ function App() {
     doc.tipo.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Fuera del componente App
-const InspeccionModal = ({ show, nuevaInspeccion, setNuevaInspeccion, setShowInspeccion, agregarInspeccion }) => {
-  if (!show) return null;
-
-  return (
-    <div className="modal-backdrop">
-      <div className="modal">
-        <h3>🧪 Nueva Inspección</h3>
-        <input
-          type="date"
-          value={nuevaInspeccion.fecha}
-          onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, fecha: e.target.value })}
-        />
-        <label className="label">Tipo de inspección</label>
-        <div className="radio-group">
-          <label className="radio-option">
-            <input
-              type="radio"
-              value="Formal"
-              checked={nuevaInspeccion.tipo === 'Formal'}
-              onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, tipo: e.target.value })}
-            /> Formal
-          </label>
-          <label className="radio-option">
-            <input
-              type="radio"
-              value="Post-operación"
-              checked={nuevaInspeccion.tipo === 'Post-operación'}
-              onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, tipo: e.target.value })}
-            /> Post-operación
-          </label>
-        </div>
-        <label className="label">Estado</label>
-        <div className="radio-group">
-          <label className="radio-option">
-            <input
-              type="radio"
-              value="Buen estado"
-              checked={nuevaInspeccion.estado === 'Buen estado'}
-              onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, estado: e.target.value })}
-            /> Buen estado
-          </label>
-          <label className="radio-option">
-            <input
-              type="radio"
-              value="Mal estado"
-              checked={nuevaInspeccion.estado === 'Mal estado'}
-              onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, estado: e.target.value })}
-            /> Mal estado
-          </label>
-        </div>
-        <input
-          placeholder="Horas de Vuelo"
-          value={nuevaInspeccion.horaVuelo}
-          onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, horaVuelo: e.target.value })}
-        />
-        <input
-          placeholder="Técnico responsable"
-          value={nuevaInspeccion.tecnico}
-          onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, tecnico: e.target.value })}
-        />
-        <textarea
-          placeholder="Observaciones"
-          value={nuevaInspeccion.observaciones}
-          onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, observaciones: e.target.value })}
-        />
-        <div className="modal-buttons">
-          <button className="outlined" onClick={() => setShowInspeccion(false)}>Cancelar</button>
-          <button onClick={agregarInspeccion}>Guardar</button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 
   if (currentView === 'list') {
     return (
@@ -214,25 +214,33 @@ const InspeccionModal = ({ show, nuevaInspeccion, setNuevaInspeccion, setShowIns
   }
 
   if (currentView === 'nuevo') {
-    return (<>
-      <div className="modal-backdrop">
-        <div className="modal">
-          <h3>📝 Nuevo Documento</h3>
-          <input placeholder="Equipo" value={nuevoDoc.tipo} onChange={e => setNuevoDoc({ ...nuevoDoc, tipo: e.target.value })} />
-          <input placeholder="Parte Nº" value={nuevoDoc.parteNumero} onChange={e => setNuevoDoc({ ...nuevoDoc, parteNumero: e.target.value })} />
-          <input placeholder="Serie Nº" value={nuevoDoc.serieNumero} onChange={e => setNuevoDoc({ ...nuevoDoc, serieNumero: e.target.value })} />
-          <input type="date" value={nuevoDoc.fechaInicial} onChange={e => setNuevoDoc({ ...nuevoDoc, fechaInicial: e.target.value })} />
-          <button onClick={() => setShowInspeccion(true)}>➕ Agregar Inspección</button>
-          {inspecciones.length > 0 && (<ul>{inspecciones.map((ins, i) => (<li key={i}>{ins.tipo} - {ins.estado}</li>))}</ul>)}
-          <div className="modal-buttons">
-            <button className="outlined" onClick={() => setCurrentView('list')}>Cancelar</button>
-            <button onClick={guardarDocumento}>💾 Guardar Documento</button>
-          </div>
+  return (<>
+    <div className="modal-backdrop">
+      <div className="modal">
+        <h3>📝 Nuevo Documento</h3>
+        <input placeholder="Equipo" value={nuevoDoc.tipo} onChange={e => setNuevoDoc({ ...nuevoDoc, tipo: e.target.value })} />
+        <input placeholder="Parte Nº" value={nuevoDoc.parteNumero} onChange={e => setNuevoDoc({ ...nuevoDoc, parteNumero: e.target.value })} />
+        <input placeholder="Serie Nº" value={nuevoDoc.serieNumero} onChange={e => setNuevoDoc({ ...nuevoDoc, serieNumero: e.target.value })} />
+        <input type="date" value={nuevoDoc.fechaInicial} onChange={e => setNuevoDoc({ ...nuevoDoc, fechaInicial: e.target.value })} />
+        <button onClick={() => setShowInspeccion(true)}>➕ Agregar Inspección</button>
+        {inspecciones.length > 0 && (<ul>{inspecciones.map((ins, i) => (<li key={i}>{ins.tipo} - {ins.estado}</li>))}</ul>)}
+        <div className="modal-buttons">
+          <button className="outlined" onClick={() => setCurrentView('list')}>Cancelar</button>
+          <button onClick={guardarDocumento}>💾 Guardar Documento</button>
         </div>
       </div>
-      <InspeccionModal />
-    </>);
-  }
+    </div>
+
+    <InspeccionModal
+      show={showInspeccion}
+      nuevaInspeccion={nuevaInspeccion}
+      setNuevaInspeccion={setNuevaInspeccion}
+      setShowInspeccion={setShowInspeccion}
+      agregarInspeccion={agregarInspeccion}
+    />
+  </>);
+}
+
 
   if (currentView === 'detalle') {
     return (<>
@@ -289,6 +297,7 @@ const InspeccionModal = ({ show, nuevaInspeccion, setNuevaInspeccion, setShowIns
   setShowInspeccion={setShowInspeccion}
   agregarInspeccion={agregarInspeccion}
 />
+
     </>);
   }
 
