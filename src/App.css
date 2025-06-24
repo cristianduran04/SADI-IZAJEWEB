@@ -208,3 +208,20 @@ input, select, textarea {
   transform: scale(1.01);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+
+
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  gap: 6px;
+}
+
+

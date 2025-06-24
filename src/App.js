@@ -152,16 +152,49 @@ function App() {
               <input type="date" value={nuevaInspeccion.fecha} onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, fecha: e.target.value })} />
 
               <label className="label">Tipo de inspección</label>
-              <div className="radio-group">
-                <label><input type="radio" value="Formal" checked={nuevaInspeccion.tipo === 'Formal'} onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, tipo: e.target.value })} /> Formal</label>
-                <label><input type="radio" value="Post-operación" checked={nuevaInspeccion.tipo === 'Post-operación'} onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, tipo: e.target.value })} /> Post-operación</label>
-              </div>
+<div className="radio-group">
+  <label className="radio-option">
+    <input
+      type="radio"
+      value="Formal"
+      checked={nuevaInspeccion.tipo === 'Formal'}
+      onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, tipo: e.target.value })}
+    />
+    Formal
+  </label>
+  <label className="radio-option">
+    <input
+      type="radio"
+      value="Post-operación"
+      checked={nuevaInspeccion.tipo === 'Post-operación'}
+      onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, tipo: e.target.value })}
+    />
+    Post-operación
+  </label>
+</div>
 
-              <label className="label">Estado</label>
-              <div className="radio-group">
-                <label><input type="radio" value="Buen estado" checked={nuevaInspeccion.estado === 'Buen estado'} onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, estado: e.target.value })} /> Buen estado</label>
-                <label><input type="radio" value="Mal estado" checked={nuevaInspeccion.estado === 'Mal estado'} onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, estado: e.target.value })} /> Mal estado</label>
-              </div>
+<label className="label">Estado</label>
+<div className="radio-group">
+  <label className="radio-option">
+    <input
+      type="radio"
+      value="Buen estado"
+      checked={nuevaInspeccion.estado === 'Buen estado'}
+      onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, estado: e.target.value })}
+    />
+    Buen estado
+  </label>
+  <label className="radio-option">
+    <input
+      type="radio"
+      value="Mal estado"
+      checked={nuevaInspeccion.estado === 'Mal estado'}
+      onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, estado: e.target.value })}
+    />
+    Mal estado
+  </label>
+</div>
+
 
               <input placeholder="Horas de Vuelo" value={nuevaInspeccion.horaVuelo} onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, horaVuelo: e.target.value })} />
               <input placeholder="Técnico responsable" value={nuevaInspeccion.tecnico} onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, tecnico: e.target.value })} />
