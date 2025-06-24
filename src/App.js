@@ -71,10 +71,14 @@ const InspeccionModal = ({ show, nuevaInspeccion, setNuevaInspeccion, setShowIns
           </label>
         </div>
         <input
-          placeholder="Horas de Vuelo"
-          value={nuevaInspeccion.horaVuelo}
-          onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, horaVuelo: e.target.value })}
-        />
+  type="number"
+  inputMode="decimal"
+  step="0.1"
+  placeholder="Horas de Vuelo"
+  value={nuevaInspeccion.horaVuelo}
+  onChange={e => setNuevaInspeccion({ ...nuevaInspeccion, horaVuelo: e.target.value })}
+/>
+
         <input
           placeholder="Técnico responsable"
           value={nuevaInspeccion.tecnico}
