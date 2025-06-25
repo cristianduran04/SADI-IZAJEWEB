@@ -127,6 +127,7 @@ function App() {
   const [vistaActual, setVistaActual] = useState('documentos');
   const [nuevoEquipo, setNuevoEquipo] = useState({ nombre: '', referencia: '', parteNumero: '', serieNumero: '', ubicacion: '', estado: 'Operativo', fechaUltimaInspeccion: new Date().toISOString().substr(0, 10), observaciones: '' });
   const [equipos, setEquipos] = useState([]);
+  const [nombresEquipos, setNombresEquipos] = useState([]);
 
   const fetchMasDocumentos = useCallback(async () => {
     if (cargando || fin) return;
@@ -187,13 +188,55 @@ function App() {
 
   useEffect(() => {
   fetchMasDocumentos();
+
   const cargarEquipos = async () => {
     const snapshot = await db.collection('equipos').get();
     const data = snapshot.docs.map(doc => doc.data());
     setEquipos(data);
   };
+
+  const cargarNombresEquiposDesdeDocumentos = async () => {
+    const snapshot = await db.collection('documentos').get();
+    const nombresUnicos = [...new Set(snapshot.docs.map(doc => doc.data().tipo))];
+    setNombresEquipos(nombresUnicos);
+  };
+
   cargarEquipos();
+  cargarNombresEquiposDesdeDocumentos();
 }, [fetchMasDocumentos]);
+
+const [documentosDisponibles, setDocumentosDisponibles] = useState([]);
+const [coincidenciasParteSerie, setCoincidenciasParteSerie] = useState([]);
+
+useEffect(() => {
+  const coincidencias = documentosDisponibles.filter(doc => doc.tipo === nuevoEquipo.nombre);
+  setCoincidenciasParteSerie(coincidencias);
+}, [nuevoEquipo.nombre, documentosDisponibles]);
+
+
+useEffect(() => {
+  fetchMasDocumentos();
+
+  const cargarEquipos = async () => {
+    const snapshot = await db.collection('equipos').get();
+    const data = snapshot.docs.map(doc => doc.data());
+    setEquipos(data);
+  };
+
+  const cargarDocumentos = async () => {
+    const snapshot = await db.collection('documentos').get();
+    const data = snapshot.docs.map(doc => doc.data());
+    setDocumentosDisponibles(data);
+
+    const nombresUnicos = [...new Set(data.map(doc => doc.tipo))];
+    setNombresEquipos(nombresUnicos);
+  };
+
+  cargarEquipos();
+  cargarDocumentos();
+}, [fetchMasDocumentos]);
+
+
 
 useEffect(() => {
   setSearch('');
@@ -253,7 +296,6 @@ useEffect(() => {
     setCurrentView('detalleEquipo');  // Ir a vista de detalle
   }}>
     <p><strong>🔧 Nombre:</strong> {eq.nombre}</p>
-    <p><strong>📎 Referencia:</strong> {eq.referencia}</p>
     <p><strong>🔢 Serie Nº:</strong> {eq.serieNumero}</p>
     <p><strong>📍 Ubicación:</strong> {eq.ubicacion}</p>
     <p><strong>⚙️ Estado:</strong> {eq.estado}</p>
@@ -285,7 +327,6 @@ useEffect(() => {
       <div className="app-bar">🛠️ Detalles del Equipo</div>
       <div className="card">
         <p><strong>🔧 Nombre:</strong> {equipo.nombre}</p>
-        <p><strong>📎 Referencia:</strong> {equipo.referencia}</p>
         <p><strong>🔧 Parte Nº:</strong> {equipo.parteNumero}</p>
         <p><strong>🔢 Serie Nº:</strong> {equipo.serieNumero}</p>
         <p><strong>📍 Ubicación:</strong> {equipo.ubicacion}</p>
@@ -315,10 +356,62 @@ useEffect(() => {
       <div className="modal-backdrop">
         <div className="modal">
           <h3>🛠️ Registro de Nuevo Equipo</h3>
-          <input className="input" placeholder="Nombre del equipo" value={nuevoEquipo.nombre} onChange={e => setNuevoEquipo({ ...nuevoEquipo, nombre: e.target.value })} />
-          <input className="input" placeholder="Referencia" value={nuevoEquipo.referencia} onChange={e => setNuevoEquipo({ ...nuevoEquipo, referencia: e.target.value })} />
-          <input className="input" placeholder="Parte Nº" value={nuevoEquipo.parteNumero} onChange={e => setNuevoEquipo({ ...nuevoEquipo, parteNumero: e.target.value })} />
-          <input className="input" placeholder="Serie Nº" value={nuevoEquipo.serieNumero} onChange={e => setNuevoEquipo({ ...nuevoEquipo, serieNumero: e.target.value })} />
+<input
+  className="input"
+  list="nombres-sugeridos"
+  placeholder="Nombre del equipo"
+  value={nuevoEquipo.nombre}
+  onChange={e => setNuevoEquipo({ ...nuevoEquipo, nombre: e.target.value })}
+/>
+<datalist id="nombres-sugeridos">
+  {nombresEquipos.map((nombre, i) => (
+    <option key={i} value={nombre} />
+  ))}
+</datalist>
+
+         {coincidenciasParteSerie.length > 0 ? (
+  <>
+    <label className="label">Parte Nº</label>
+    <select
+      className="input"
+      value={nuevoEquipo.parteNumero}
+      onChange={e => setNuevoEquipo({ ...nuevoEquipo, parteNumero: e.target.value })}
+    >
+      <option value="">Selecciona una parte</option>
+      {[...new Set(coincidenciasParteSerie.map(doc => doc.parteNumero))].map((parte, idx) => (
+        <option key={idx} value={parte}>{parte}</option>
+      ))}
+    </select>
+
+    <label className="label">Serie Nº</label>
+    <select
+      className="input"
+      value={nuevoEquipo.serieNumero}
+      onChange={e => setNuevoEquipo({ ...nuevoEquipo, serieNumero: e.target.value })}
+    >
+      <option value="">Selecciona una serie</option>
+      {[...new Set(coincidenciasParteSerie.map(doc => doc.serieNumero))].map((serie, idx) => (
+        <option key={idx} value={serie}>{serie}</option>
+      ))}
+    </select>
+  </>
+) : (
+  <>
+    <input
+      className="input"
+      placeholder="Parte Nº"
+      value={nuevoEquipo.parteNumero}
+      onChange={e => setNuevoEquipo({ ...nuevoEquipo, parteNumero: e.target.value })}
+    />
+    <input
+      className="input"
+      placeholder="Serie Nº"
+      value={nuevoEquipo.serieNumero}
+      onChange={e => setNuevoEquipo({ ...nuevoEquipo, serieNumero: e.target.value })}
+    />
+  </>
+)}
+
           <input className="input" placeholder="Ubicación" value={nuevoEquipo.ubicacion} onChange={e => setNuevoEquipo({ ...nuevoEquipo, ubicacion: e.target.value })} />
           <label className="label">Estado:</label>
           <div className="radio-group">
