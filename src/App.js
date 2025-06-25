@@ -260,6 +260,41 @@ useEffect(() => {
   }
 }, [currentView]);
 
+useEffect(() => {
+  const buscarDatosPorSerie = async () => {
+    const serie = nuevoEquipo.serieNumero.trim();
+
+    if (serie === '') {
+      // Si se borra el serieNumero, limpiamos también nombre y parte si estaban autocompletados
+      setNuevoEquipo(prev => ({
+        ...prev,
+        nombre: '',
+        parteNumero: ''
+      }));
+      return;
+    }
+
+    const snapshot = await db.collection('documentos')
+      .where('serieNumero', '==', serie)
+      .get();
+
+    if (!snapshot.empty) {
+      const doc = snapshot.docs[0].data();
+
+      setNuevoEquipo(prev => ({
+        ...prev,
+        // Solo rellenar si están vacíos para no impedir que se borren
+        nombre: prev.nombre ? prev.nombre : doc.tipo,
+        parteNumero: prev.parteNumero ? prev.parteNumero : doc.parteNumero
+      }));
+    }
+  };
+
+  buscarDatosPorSerie();
+}, [nuevoEquipo.serieNumero]);
+
+
+
 
   const filtrados = documentos.filter(doc =>
     doc.serieNumero.toLowerCase().includes(search.toLowerCase()) ||
@@ -269,11 +304,13 @@ useEffect(() => {
   if (currentView === 'list') {
     return (
       <div className="container">
-        <div className="app-bar">📁 {vistaActual === 'documentos' ? 'Documentos' : 'Equipos'}</div>
+        <div className="app-bar">📁 {vistaActual === 'documentos' ? 'BASE FRONTINO' : 'CONTROL'}</div>
+
 
         <div className="toggle-buttons">
-          <button onClick={() => setVistaActual('documentos')} className={vistaActual === 'documentos' ? 'active' : ''}>📄 Documentos</button>
-          <button onClick={() => setVistaActual('equipos')} className={vistaActual === 'equipos' ? 'active' : ''}>🛠️ Equipos</button>
+          <button onClick={() => setVistaActual('documentos')} className={vistaActual === 'documentos' ? 'active' : ''}>📄 BASE FRONTINO</button>
+<button onClick={() => setVistaActual('equipos')} className={vistaActual === 'equipos' ? 'active' : ''}>🛠️ CONTROL</button>
+
         </div>
 
         <input type="text" placeholder={`Buscar por ${vistaActual === 'documentos' ? 'serie o tipo' : 'nombre o referencia'}...`} value={search} onChange={e => setSearch(e.target.value)} />
