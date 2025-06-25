@@ -245,3 +245,23 @@ input, select, textarea {
   border-radius: 10px;
 }
 
+
+.fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 1000;
+}
+
+
+
+
+
