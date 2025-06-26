@@ -313,7 +313,7 @@ useEffect(() => {
 
         </div>
 
-        <input type="text" placeholder={`Buscar por ${vistaActual === 'documentos' ? 'serie o tipo' : 'nombre o referencia'}...`} value={search} onChange={e => setSearch(e.target.value)} />
+        <input type="text" placeholder={`Buscar por ${vistaActual === 'documentos' ? 'serie o tipo' : 'nombre o serie'}...`} value={search} onChange={e => setSearch(e.target.value)} />
 
         {vistaActual === 'documentos' && filtrados.map((doc, index) => (
           <div key={index} className="card" onClick={() => { setSelectedDoc(doc); setCurrentView('detalle'); }}>
