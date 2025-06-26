@@ -1,5 +1,4 @@
 // Reemplaza todo el contenido de tu archivo src/App.js con este código
-
 import React, { useEffect, useState, useCallback } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
@@ -186,24 +185,7 @@ function App() {
     }, 0).toFixed(1);
   };
 
-  useEffect(() => {
-  fetchMasDocumentos();
-
-  const cargarEquipos = async () => {
-    const snapshot = await db.collection('equipos').get();
-    const data = snapshot.docs.map(doc => doc.data());
-    setEquipos(data);
-  };
-
-  const cargarNombresEquiposDesdeDocumentos = async () => {
-    const snapshot = await db.collection('documentos').get();
-    const nombresUnicos = [...new Set(snapshot.docs.map(doc => doc.data().tipo))];
-    setNombresEquipos(nombresUnicos);
-  };
-
-  cargarEquipos();
-  cargarNombresEquiposDesdeDocumentos();
-}, [fetchMasDocumentos]);
+  
 
 const [documentosDisponibles, setDocumentosDisponibles] = useState([]);
 const [coincidenciasParteSerie, setCoincidenciasParteSerie] = useState([]);

@@ -1,6 +1,11 @@
 /* Importar Roboto */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
+/* Box-sizing global */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 /* General */
 body {
   margin: 0;
@@ -35,18 +40,19 @@ body {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  background-color: #1976d2;
+  background: #1976d2;
   color: white;
   border: none;
   border-radius: 50%;
+  font-size: 24px;
   width: 56px;
   height: 56px;
-  font-size: 28px;
-  cursor: pointer;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  cursor: pointer;
+  z-index: 1000;
 }
 
 .fab:hover {
@@ -59,7 +65,14 @@ body {
   border-radius: 12px;
   padding: 16px;
   margin: 12px 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: transform 0.1s ease;
+  cursor: pointer;
+}
+
+.card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .card h3 {
@@ -101,7 +114,7 @@ button.outlined:hover {
   background-color: rgba(25, 118, 210, 0.08);
 }
 
-/* Inputs y selects */
+/* Inputs, selects y textarea */
 input, select, textarea {
   width: 100%;
   padding: 10px;
@@ -109,7 +122,6 @@ input, select, textarea {
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 8px;
-  box-sizing: border-box;
 }
 
 /* Etiquetas */
@@ -152,7 +164,7 @@ input, select, textarea {
   margin-top: 20px;
 }
 
-/* Modal flotante */
+/* Modal */
 .modal-backdrop {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -160,6 +172,7 @@ input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow-y: auto;
   z-index: 1000;
 }
 
@@ -170,23 +183,26 @@ input, select, textarea {
   max-width: 500px;
   width: 90%;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  margin: auto;
 }
 
-/* Radio buttons personalizados */
+/* Grupo de radios */
 .radio-group {
   display: flex;
+  flex-wrap: wrap;
   gap: 16px;
+  align-items: center;
   margin-bottom: 12px;
 }
 
 .radio-group label {
-  font-size: 15px;
   display: flex;
   align-items: center;
+  font-size: 15px;
   gap: 6px;
 }
 
-/* Botones dentro del modal */
+/* Botones del modal */
 .modal-buttons {
   display: flex;
   justify-content: flex-end;
@@ -194,74 +210,47 @@ input, select, textarea {
   margin-top: 16px;
 }
 
-
-.card {
-  background-color: white;
-  border-radius: 12px;
-  padding: 16px;
-  margin: 12px 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: transform 0.1s ease;
-  cursor: pointer;
-}
-.card:hover {
-  transform: scale(1.01);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-
-.radio-group {
+/* Botones de vista */
+.toggle-buttons {
   display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  align-items: center;
+  gap: 12px;
+  margin: 16px 0;
 }
 
-.radio-group label {
-  display: flex;
-  align-items: center;
-  font-size: 15px;
-  gap: 6px;
+.toggle-buttons button {
+  border-radius: 20px;
+  padding: 8px 16px;
 }
 
-
-
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow-y: auto;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+.toggle-buttons .active {
+  background-color: #1565c0;
 }
 
-.modal {
-  margin: auto;
-  max-width: 500px;
-  padding: 20px;
-  background: white;
-  border-radius: 10px;
+/* Responsive */
+@media (max-width: 480px) {
+  .app-bar {
+    font-size: 18px;
+    padding: 12px;
+  }
+
+  .fab {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+    bottom: 16px;
+    right: 16px;
+  }
+
+  .card {
+    padding: 12px;
+  }
+
+  input, select, textarea {
+    font-size: 14px;
+  }
+
+  button {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
 }
-
-
-.fab {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: #1976d2;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  font-size: 24px;
-  padding: 16px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  cursor: pointer;
-  z-index: 1000;
-}
-
-
-
-
-
