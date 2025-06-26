@@ -326,7 +326,8 @@ useEffect(() => {
 
         {vistaActual === 'equipos' && equipos.filter(eq =>
   eq.nombre.toLowerCase().includes(search.toLowerCase()) ||
-  eq.referencia.toLowerCase().includes(search.toLowerCase())
+  eq.serieNumero.toLowerCase().includes(search.toLowerCase())
+
 ).map((eq, idx) => (
   <div key={idx} className="card" onClick={() => {
     setSelectedDoc(eq);      // Guardar equipo seleccionado
