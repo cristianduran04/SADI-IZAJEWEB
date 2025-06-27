@@ -174,10 +174,23 @@ function App() {
       const snapshot = await db.collection('documentos').where("serieNumero", "==", selectedDoc.serieNumero).get();
       const docId = snapshot.docs[0]?.id;
       if (docId) {
-        const nuevas = [...selectedDoc.inspecciones, nueva];
-        await db.collection('documentos').doc(docId).update({ inspecciones: nuevas });
-        setSelectedDoc({ ...selectedDoc, inspecciones: nuevas });
-      }
+  const nuevas = [...(selectedDoc.inspecciones || []), nueva];
+  await db.collection('documentos').doc(docId).update({ inspecciones: nuevas });
+
+  // Actualizar documento seleccionado
+  const actualizado = { ...selectedDoc, inspecciones: nuevas };
+  setSelectedDoc(actualizado);
+
+  // ACTUALIZAR lista completa de documentos también
+  setDocumentos(prev =>
+    prev.map(doc =>
+      doc.serieNumero === selectedDoc.serieNumero
+        ? actualizado
+        : doc
+    )
+  );
+}
+
     }
     setNuevaInspeccion({ tipo: 'Post-operación', estado: 'Buen estado', observaciones: '', horaVuelo: '', tecnico: '', fecha: new Date().toISOString().substr(0, 10) });
     setShowInspeccion(false);
