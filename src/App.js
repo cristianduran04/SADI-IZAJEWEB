@@ -147,19 +147,24 @@ function App() {
   }, [cargando, fin, ultimoDoc]);
 
   const guardarDocumento = async () => {
-    const doc = {
-      ...nuevoDoc,
-      fechaInicial: getLocalDateTimestamp(nuevoDoc.fechaInicial),
-      inspecciones
-    };
-    await db.collection('documentos').add(doc);
-    setInspecciones([]);
-    setCurrentView('list');
-    setDocumentos([]);
-    setUltimoDoc(null);
-    setFin(false);
-    fetchMasDocumentos();
+  const doc = {
+    ...nuevoDoc,
+    fechaInicial: getLocalDateTimestamp(nuevoDoc.fechaInicial),
+    inspecciones
   };
+
+  // Guardar en Firestore
+  const docRef = await db.collection('documentos').add(doc);
+
+  // Agregar manualmente al estado local con ID
+  const nuevoConId = { ...doc, id: docRef.id };
+  setDocumentos(prev => [nuevoConId, ...prev]);
+
+  // Limpiar y volver a la vista principal
+  setInspecciones([]);
+  setCurrentView('list');
+};
+
 
   const agregarInspeccion = async () => {
     const nueva = { ...nuevaInspeccion, fecha: getLocalDateTimestamp(nuevaInspeccion.fecha) };
