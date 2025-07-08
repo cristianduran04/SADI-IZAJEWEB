@@ -3,6 +3,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import './App.css';
+import * as XLSX from 'xlsx';
+
 
 const firebaseConfig = {
   apiKey: "AIzaSyCrYxHwxhG7NuJ2s7P_F2ylPyq18yO_Klk",
@@ -203,6 +205,111 @@ function App() {
     }, 0).toFixed(1);
   };
 
+  const exportarExcel = async (modo) => {
+  const ahora = new Date();
+  let inicioFiltro = null;
+
+  if (modo === 'dia') {
+    inicioFiltro = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate()).setHours(0, 0, 0, 0);
+  } else if (modo === 'semana') {
+    const diaSemana = ahora.getDay();
+    const primerDiaSemana = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() - diaSemana);
+    inicioFiltro = primerDiaSemana.setHours(0, 0, 0, 0);
+  } else if (modo === 'mes') {
+    const primerDiaMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1);
+    inicioFiltro = primerDiaMes.setHours(0, 0, 0, 0);
+  }
+
+  const snapshot = await db.collection('documentos').get();
+  if (snapshot.empty) {
+    alert("No hay documentos para exportar.");
+    return;
+  }
+
+  const dataFinal = [];
+
+  snapshot.forEach(doc => {
+  const datos = doc.data();
+  const inspecciones = datos.inspecciones || [];
+
+  // Si no hay inspecciones, evaluar solo fechaInicial del documento
+  if (inspecciones.length === 0) {
+    let timestamp = 0;
+    if (typeof datos.fechaInicial === 'number') {
+      timestamp = datos.fechaInicial;
+    } else if (typeof datos.fechaInicial === 'string') {
+      timestamp = getLocalDateTimestamp(datos.fechaInicial);
+    } else if (datos.fechaInicial?.toDate) {
+      timestamp = datos.fechaInicial.toDate().getTime();
+    }
+
+    if (modo !== 'todo' && (!timestamp || timestamp < inicioFiltro)) return;
+
+    dataFinal.push({
+      Tipo: datos.tipo || '',
+      Parte: datos.parteNumero || '',
+      Serie: datos.serieNumero || '',
+      Fecha: timestamp ? new Date(timestamp).toLocaleDateString() : '',
+      Inspección: "Sin inspecciones",
+      Estado: "",
+      Horas: "",
+      Técnico: "",
+      Observaciones: ""
+    });
+  } else {
+    inspecciones.forEach(ins => {
+      let ts = 0;
+      if (typeof ins.fecha === 'number') {
+        ts = ins.fecha;
+      } else if (typeof ins.fecha === 'string') {
+        ts = getLocalDateTimestamp(ins.fecha);
+      } else if (ins.fecha?.toDate) {
+        ts = ins.fecha.toDate().getTime();
+      }
+
+      // Aplica el filtro al timestamp de la inspección
+      if (modo !== 'todo' && (!ts || ts < inicioFiltro)) return;
+
+      dataFinal.push({
+        Tipo: datos.tipo || '',
+        Parte: datos.parteNumero || '',
+        Serie: datos.serieNumero || '',
+        Fecha: new Date(ts).toLocaleDateString(),
+        Inspección: ins.tipo || '',
+        Estado: ins.estado || '',
+        Horas: ins.horaVuelo || '',
+        Técnico: ins.tecnico || '',
+        Observaciones: ins.observaciones || ''
+      });
+    });
+  }
+});
+
+
+  if (dataFinal.length === 0) {
+    alert("No hay documentos que exportar.");
+    return;
+  }
+
+  // Ordenar por fecha
+  dataFinal.sort((a, b) => {
+    const fa = new Date(a.Fecha).getTime();
+    const fb = new Date(b.Fecha).getTime();
+    return fa - fb;
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(dataFinal, {
+    header: ['Tipo', 'Parte', 'Serie', 'Fecha', 'Inspección', 'Estado', 'Horas', 'Técnico', 'Observaciones']
+  });
+  XLSX.utils.book_append_sheet(wb, ws, "Inspecciones");
+
+  const nombreArchivo = `informe_${modo || 'todo'}_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`;
+  XLSX.writeFile(wb, nombreArchivo);
+};
+
+
+
   
 
 const [documentosDisponibles, setDocumentosDisponibles] = useState([]);
@@ -315,6 +422,18 @@ useEffect(() => {
 
         <input type="text" placeholder={`Buscar por ${vistaActual === 'documentos' ? 'serie o tipo' : 'nombre o serie'}...`} value={search} onChange={e => setSearch(e.target.value)} />
 
+{vistaActual === 'documentos' && (
+  <div className="export-buttons">
+    <button onClick={() => exportarExcel('dia')}>📅 Día</button>
+    <button onClick={() => exportarExcel('semana')}>📆 Semana</button>
+    <button onClick={() => exportarExcel('mes')}>🗓️ Mes</button>
+    <button onClick={() => exportarExcel(null)}>📤 Todo</button>
+  </div>
+)}
+
+
+
+
         {vistaActual === 'documentos' && filtrados.map((doc, index) => (
           <div key={index} className="card" onClick={() => { setSelectedDoc(doc); setCurrentView('detalle'); }}>
             <p><strong>📌 Equipo:</strong> {doc.tipo}</p>
@@ -347,6 +466,8 @@ useEffect(() => {
             {cargando ? 'Cargando...' : 'Ver más'}
           </button>
         )}
+        
+
 
         {vistaActual === 'documentos' && (
           <button className="fab" onClick={() => setCurrentView('nuevo')}>➕</button>
